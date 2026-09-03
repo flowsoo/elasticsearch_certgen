@@ -36,10 +36,11 @@ CA_CERT="${CERT_DIR}/ca/${CA_NAME}/ca/ca.crt"
 
 
 # ------------------------------------------------------------
-# PKCS#12 password
+# PKCS#12 passwords
 # ------------------------------------------------------------
 
-P12_PASSWORD="YOUR_P12_PASSWORD"
+TRANSPORT_P12_PASSWORD="YOUR_TRANSPORT_P12_PASSWORD"
+HTTP_P12_PASSWORD="YOUR_HTTP_P12_PASSWORD"
 
 
 # ------------------------------------------------------------
@@ -115,7 +116,7 @@ echo "Creating ${NODE1_NAME}-transport.p12..."
     -inkey "${TRANSPORT_DIR}/${NODE1_NAME}/${NODE1_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE1_NAME}/${NODE1_NAME}.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE1_NAME}-transport"
 
 
@@ -130,7 +131,7 @@ echo "Creating ${NODE1_NAME}-http.p12..."
     -inkey "${HTTP_DIR}/${NODE1_NAME}-http/${NODE1_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE1_NAME}-http/${NODE1_NAME}-http.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE1_NAME}-http"
 
 
@@ -145,7 +146,7 @@ echo "Creating ${NODE2_NAME}-transport.p12..."
     -inkey "${TRANSPORT_DIR}/${NODE2_NAME}/${NODE2_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE2_NAME}/${NODE2_NAME}.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE2_NAME}-transport"
 
 
@@ -160,7 +161,7 @@ echo "Creating ${NODE2_NAME}-http.p12..."
     -inkey "${HTTP_DIR}/${NODE2_NAME}-http/${NODE2_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE2_NAME}-http/${NODE2_NAME}-http.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE2_NAME}-http"
 
 
@@ -175,7 +176,7 @@ echo "Creating ${NODE3_NAME}-transport.p12..."
     -inkey "${TRANSPORT_DIR}/${NODE3_NAME}/${NODE3_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE3_NAME}/${NODE3_NAME}.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE3_NAME}-transport"
 
 
@@ -190,7 +191,7 @@ echo "Creating ${NODE3_NAME}-http.p12..."
     -inkey "${HTTP_DIR}/${NODE3_NAME}-http/${NODE3_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE3_NAME}-http/${NODE3_NAME}-http.crt" \
     -certfile "${CA_CERT}" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE3_NAME}-http"
 
 
