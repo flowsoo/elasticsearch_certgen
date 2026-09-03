@@ -1,4 +1,6 @@
-variables required remain:
+CERTIFICATE GENERATION
+
+Certificate Generation variables required remain:
 
 ELASTICSEARCH_CERTUTIL
 OPENSSL
@@ -17,3 +19,56 @@ NODE2_IP
 NODE3_NAME
 NODE3_DNS
 NODE3_IP
+- - - - 
+
+P12 GENERATION
+
+following p12 generation environment-specific inputs need to be changed:
+
+OPENSSL
+CERT_DIR
+P12_DIR — normally derived, so no need to change
+CA_NAME
+CA_CERT — normally derived, so no need to change
+P12_PASSWORD
+NODE1_NAME
+NODE2_NAME
+NODE3_NAME
+
+-----
+
+CERT_DIR/
+├── ca/
+│   └── CLUSTER_NAME-CA/
+│       └── ca/
+│           └── ca.crt
+│
+├── transport/
+│   ├── NODE1_NAME/
+│   │   ├── NODE1_NAME.crt
+│   │   └── NODE1_NAME.key
+│   ├── NODE2_NAME/
+│   │   ├── NODE2_NAME.crt
+│   │   └── NODE2_NAME.key
+│   └── NODE3_NAME/
+│       ├── NODE3_NAME.crt
+│       └── NODE3_NAME.key
+│
+├── http/
+│   ├── NODE1_NAME-http/
+│   │   ├── NODE1_NAME-http.crt
+│   │   └── NODE1_NAME-http.key
+│   ├── NODE2_NAME-http/
+│   │   ├── NODE2_NAME-http.crt
+│   │   └── NODE2_NAME-http.key
+│   └── NODE3_NAME-http/
+│       ├── NODE3_NAME-http.crt
+│       └── NODE3_NAME-http.key
+│
+└── p12/
+    ├── NODE1_NAME-transport.p12
+    ├── NODE1_NAME-http.p12
+    ├── NODE2_NAME-transport.p12
+    ├── NODE2_NAME-http.p12
+    ├── NODE3_NAME-transport.p12
+    └── NODE3_NAME-http.p12
