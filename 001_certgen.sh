@@ -31,14 +31,14 @@ OUTPUT_DIR="/path/to/certificate/output"
 # ------------------------------------------------------------
 
 CA_NAME="${CLUSTER_NAME}-CA"
-CA_PASSWORD="YOUR_CA_PASSWORD"
 
 
 # ------------------------------------------------------------
 # PKCS#12
 # ------------------------------------------------------------
 
-P12_PASSWORD="YOUR_P12_PASSWORD"
+TRANSPORT_P12_PASSWORD="YOUR_TRANSPORT_P12_PASSWORD"
+HTTP_P12_PASSWORD="YOUR_HTTP_P12_PASSWORD"
 
 
 # ------------------------------------------------------------
@@ -94,7 +94,7 @@ echo "Generating CA..."
     --silent \
     --pem \
     --out "${CA_DIR}/${CA_NAME}.zip" \
-    --pass "${CA_PASSWORD}"
+    --pass ""
 
 "${UNZIP}" -o \
     "${CA_DIR}/${CA_NAME}.zip" \
@@ -194,7 +194,7 @@ echo "Creating transport PKCS#12 files..."
     -inkey "${TRANSPORT_DIR}/${NODE1_NAME}/${NODE1_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE1_NAME}/${NODE1_NAME}.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE1_NAME}-transport"
 
 "${OPENSSL}" pkcs12 -export \
@@ -202,7 +202,7 @@ echo "Creating transport PKCS#12 files..."
     -inkey "${TRANSPORT_DIR}/${NODE2_NAME}/${NODE2_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE2_NAME}/${NODE2_NAME}.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE2_NAME}-transport"
 
 "${OPENSSL}" pkcs12 -export \
@@ -210,7 +210,7 @@ echo "Creating transport PKCS#12 files..."
     -inkey "${TRANSPORT_DIR}/${NODE3_NAME}/${NODE3_NAME}.key" \
     -in "${TRANSPORT_DIR}/${NODE3_NAME}/${NODE3_NAME}.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${TRANSPORT_P12_PASSWORD}" \
     -name "${NODE3_NAME}-transport"
 
 
@@ -225,7 +225,7 @@ echo "Creating HTTP PKCS#12 files..."
     -inkey "${HTTP_DIR}/${NODE1_NAME}-http/${NODE1_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE1_NAME}-http/${NODE1_NAME}-http.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE1_NAME}-http"
 
 "${OPENSSL}" pkcs12 -export \
@@ -233,7 +233,7 @@ echo "Creating HTTP PKCS#12 files..."
     -inkey "${HTTP_DIR}/${NODE2_NAME}-http/${NODE2_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE2_NAME}-http/${NODE2_NAME}-http.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE2_NAME}-http"
 
 "${OPENSSL}" pkcs12 -export \
@@ -241,7 +241,7 @@ echo "Creating HTTP PKCS#12 files..."
     -inkey "${HTTP_DIR}/${NODE3_NAME}-http/${NODE3_NAME}-http.key" \
     -in "${HTTP_DIR}/${NODE3_NAME}-http/${NODE3_NAME}-http.crt" \
     -certfile "${CA_DIR}/${CA_NAME}/ca/ca.crt" \
-    -passout "pass:${P12_PASSWORD}" \
+    -passout "pass:${HTTP_P12_PASSWORD}" \
     -name "${NODE3_NAME}-http"
 
 
