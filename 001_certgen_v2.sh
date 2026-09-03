@@ -73,17 +73,36 @@ NODE3_IP="YOUR_NODE_3_IP"
 
 # Fail fast (with a clear message) instead of failing halfway through
 # with a confusing "no such file or directory" error.
+#
+# Deliberately avoids bash's ${!var} indirect-expansion trick: if this
+# script is ever sourced from a non-bash interactive shell (e.g. zsh,
+# the macOS default), the shebang is bypassed and ${!var} does not
+# mean the same thing there \u2014 it can error out instead of expanding.
+# Plain, explicit checks work the same everywhere.
 
-for var in CLUSTER_NAME OUTPUT_DIR TRANSPORT_P12_PASSWORD HTTP_P12_PASSWORD \
-           NODE1_NAME NODE1_DNS NODE1_IP \
-           NODE2_NAME NODE2_DNS NODE2_IP \
-           NODE3_NAME NODE3_DNS NODE3_IP; do
-    if [[ "${!var}" == YOUR_* ]]; then
-        echo "ERROR: ${var} still has its placeholder value ('${!var}')." >&2
+check_placeholder() {
+    local name="$1"
+    local value="$2"
+    if [[ "${value}" == YOUR_* ]]; then
+        echo "ERROR: ${name} still has its placeholder value ('${value}')." >&2
         echo "Edit the variables at the top of this script before running it." >&2
         exit 1
     fi
-done
+}
+
+check_placeholder "CLUSTER_NAME"          "${CLUSTER_NAME}"
+check_placeholder "OUTPUT_DIR"            "${OUTPUT_DIR}"
+check_placeholder "TRANSPORT_P12_PASSWORD" "${TRANSPORT_P12_PASSWORD}"
+check_placeholder "HTTP_P12_PASSWORD"     "${HTTP_P12_PASSWORD}"
+check_placeholder "NODE1_NAME"            "${NODE1_NAME}"
+check_placeholder "NODE1_DNS"             "${NODE1_DNS}"
+check_placeholder "NODE1_IP"              "${NODE1_IP}"
+check_placeholder "NODE2_NAME"            "${NODE2_NAME}"
+check_placeholder "NODE2_DNS"             "${NODE2_DNS}"
+check_placeholder "NODE2_IP"              "${NODE2_IP}"
+check_placeholder "NODE3_NAME"            "${NODE3_NAME}"
+check_placeholder "NODE3_DNS"             "${NODE3_DNS}"
+check_placeholder "NODE3_IP"              "${NODE3_IP}"
 
 for tool in "${ELASTICSEARCH_CERTUTIL}" "${OPENSSL}" "${UNZIP}"; do
     if [[ ! -x "${tool}" ]]; then
@@ -124,11 +143,16 @@ echo "Generating CA..."
     "${CA_DIR}/${CA_NAME}.zip" \
     -d "${CA_DIR}"
 
-# elasticsearch-certutil's --pem CA zip extracts to a top-level "ca/"
-# folder (ca/ca.crt, ca/ca.key) \u2014 there is no subfolder named after
-# the CA itself.
-CA_CERT="${CA_DIR}/ca/ca.crt"
-CA_KEY="${CA_DIR}/ca/ca.key"
+# elasticsearch-certutil's --pem CA zip always extracts to a top-level
+# folder literally named "ca/" (ca/ca.crt, ca/ca.key) \u2014 it ignores
+# CA_NAME for the folder name (CA_NAME only affects the zip filename
+# and the CA's CN). Rename it to CA_NAME here so the variable stays
+# meaningful for the rest of the script and CA_DIR isn't ambiguous if
+# you ever generate more than one CA in the same OUTPUT_DIR.
+mv "${CA_DIR}/ca" "${CA_DIR}/${CA_NAME}"
+
+CA_CERT="${CA_DIR}/${CA_NAME}/ca.crt"
+CA_KEY="${CA_DIR}/${CA_NAME}/ca.key"
 
 if [[ ! -f "${CA_CERT}" || ! -f "${CA_KEY}" ]]; then
     echo "ERROR: expected CA files not found at ${CA_CERT} / ${CA_KEY}" >&2
