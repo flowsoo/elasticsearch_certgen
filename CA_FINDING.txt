@@ -1,0 +1,17 @@
+1. Extract the live node certificate
+
+openssl s_client -connect NODE_IP:9300 -showcerts </dev/null 2>/dev/null \
+  | openssl x509 -out /tmp/live-node.crt
+
+2. Test every CA you have
+
+for ca in /path/to/cas/*.crt; do
+    echo -n "$ca: "
+    openssl verify -CAfile "$ca" /tmp/live-node.crt 2>/dev/null
+done
+
+The CA that returns:
+
+/path/to/cas/the-right-one.crt: /tmp/live-node.crt: OK
+
+is the CA that signed the certificate currently being presented by the node.
