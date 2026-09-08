@@ -1,0 +1,58 @@
+OPENSSL
+
+
+openssl pkcs12 \
+  -in /path/to/node1-transport.p12 \
+  -clcerts \
+  -nokeys \
+  -out /tmp/node1-transport-cert.pem
+
+
+ openssl x509 \
+  -in /tmp/node1-transport-cert.pem \
+  -noout \
+  -subject \
+  -issuer \
+  -dates \
+  -fingerprint \
+  -sha256 \
+  -ext subjectAltName 
+
+
+openssl pkcs12 \
+  -in /path/to/node1-transport.p12 \
+  -cacerts \
+  -nokeys \
+  -out /tmp/node1-transport-ca.pem
+
+  openssl x509 \
+  -in /tmp/node1-transport-ca.pem \
+  -noout \
+  -subject \
+  -issuer \
+  -dates \
+  -fingerprint \
+  -sha256
+
+
+
+  openssl pkcs12 \
+  -in /path/to/node1-transport.p12 \
+  -nocerts \
+  -nodes \
+  -out /tmp/node1-transport-key.pem
+
+
+  openssl x509 \
+  -in /tmp/node1-transport-cert.pem \
+  -pubkey \
+  -noout \
+  | openssl pkey \
+      -pubin \
+      -outform DER \
+      | sha256sum
+
+  ====================================
+
+
+  
