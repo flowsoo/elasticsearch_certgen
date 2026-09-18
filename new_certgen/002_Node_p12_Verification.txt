@@ -1,0 +1,71 @@
+Run these checks against `hot-1-transport/instance/instance.p12` and compare with what you already know about the existing file.
+
+**1. Confirm the private key is present and unlocks with hot-1's existing passphrase**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 \
+  -nocerts -nodes \
+  -passin pass:'<hot-1-existing-transport-passphrase>' \
+  -out /tmp/verify-key.pem 2>&1
+```
+
+If this fails with a MAC/password error, the passphrase didn't take \u2014 stop and investigate before going further. If it succeeds silently, the key is there and unlocks correctly.
+
+Then:
+
+```bash
+openssl pkey -in /tmp/verify-key.pem -noout -check -passin pass:'<hot-1-existing-transport-passphrase>'
+rm /tmp/verify-key.pem
+```
+
+Should print `Key is valid`.
+
+**2. Confirm the CN matches the original**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 -passin pass: -nodes 2>/dev/null | openssl x509 -noout -subject
+```
+
+Should return `subject=CN = instance` \u2014 matching what you confirmed on the old cert.
+
+**3. Confirm it's signed by the new CA, not the old one**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 -passin pass: -nodes 2>/dev/null | openssl x509 -noout -issuer
+```
+
+Compare against your new CA's subject:
+
+```bash
+openssl x509 -in /root/es-cert-renewal/new-ca.crt -noout -subject
+```
+
+(If you don't have `new-ca.crt` extracted yet: `openssl pkcs12 -in /root/es-cert-renewal/new-ca.p12 -clcerts -nokeys -passin pass: -out /root/es-cert-renewal/new-ca.crt`)
+
+The `issuer` line from the node cert should match the `subject` line from the CA cert.
+
+**4. Confirm the validity dates are correct (new expiry, not the old expired one)**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 -passin pass: -nodes 2>/dev/null | openssl x509 -noout -dates
+```
+
+`notAfter` should be a future date matching whatever `-days` value certutil used by default (typically 5 years unless overridden).
+
+**5. Confirm the `.p12` store password behaves as expected (blank, matching your current setup)**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 -info -noout -passin pass:
+```
+
+Should not error asking for a password \u2014 confirms the store-level password is blank, consistent with your existing files.
+
+**6. Confirm the CA certificate is actually bundled inside**
+
+```bash
+openssl pkcs12 -in hot-1-transport/instance/instance.p12 -passin pass: -cacerts -nokeys -nodes 2>/dev/null | openssl x509 -noout -subject
+```
+
+Should show the new CA's subject \u2014 confirming trust material is included, not just the leaf cert.
+
+If all six checks come back as expected \u2014 key unlocks with the existing passphrase, CN matches, issuer is the new CA, dates are fresh, store password blank, CA bundled \u2014 the file is a valid drop-in replacement for the existing `hot-1` transport `.p12`.
