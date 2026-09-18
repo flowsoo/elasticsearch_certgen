@@ -48,3 +48,49 @@ unzip hot-1-transport.zip -d hot-1-transport
 
 
 Result: `hot-1-transport/instance/instance.p12` — hot-1's new transport `.p12`, containing the new private key (protected by hot-1's existing passphrase), new certificate, and the new CA.
+
+
+===================================
+
+Extract the unencrypted key and cert separately:
+
+bash
+cd hot-1-transport-plain/instance
+openssl pkcs12 -in instance.p12 -passin pass: -nocerts -nodes -out instance-key-plain.pem
+openssl pkcs12 -in instance.p12 -passin pass: -clcerts -nokeys -out instance-cert.pem
+
+Re-encrypt the key with the existing passphrase:
+
+bash
+openssl pkey -in instance-key-plain.pem \
+  -aes256 \
+  -out instance-key-encrypted.pem \
+  -passout pass:'<hot-1-existing-transport-passphrase>'
+
+Repackage into the final .p12, blank store password, matching original structure:
+
+bash
+openssl pkcs12 -export \
+  -inkey instance-key-encrypted.pem -passin pass:'<hot-1-existing-transport-passphrase>' \
+  -in instance-cert.pem \
+  -certfile /root/es-cert-renewal/new-ca.crt \
+  -name instance \
+  -out hot-1-transport-final.p12 \
+  -passout pass:
+
+Verify it now matches the original structure exactly:
+
+bash
+openssl pkcs12 -in hot-1-transport-final.p12 -info -noout -passin pass:
+
+Should open with blank store password. Then confirm the key still needs the existing passphrase:
+
+bash
+openssl pkcs12 -in hot-1-transport-final.p12 -passin pass: -nocerts -nodes -out /dev/stdout | openssl pkey -noout -check -passin pass:'<hot-1-existing-transport-passphrase>'
+
+
+
+
+
+
+
