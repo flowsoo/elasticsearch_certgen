@@ -1,0 +1,50 @@
+## Information you should have available before starting
+
+- New CA output filename/location (you're choosing this — e.g. `/root/es-cert-renewal/new-ca.p12`)
+- hot-1's existing CN (`instance`, confirmed)
+- hot-1's existing transport passphrase (retrieved from hot-1's Elasticsearch keystore)
+- hot-1's node name for the instances file (`hot-1`)
+
+
+## STEP 4 — GENERATE THE NEW CA
+
+
+mkdir -p /root/es-cert-renewal && cd /root/es-cert-renewal
+
+/usr/share/elasticsearch/bin/elasticsearch-certutil ca \
+  --out /root/es-cert-renewal/new-ca.p12 \
+  --pass ''
+
+
+## STEP 5 — CREATE THE SINGLE-INSTANCE YAML FOR HOT-1 TRANSPORT
+
+
+cat > /root/es-cert-renewal/hot-1-transport-instance.yml << 'EOF'
+instances:
+  - name: "instance"
+EOF
+
+
+(`name: "instance"` matches the existing CN you confirmed. If you'd rather the new cert's CN be `hot-1` instead of `instance`, change this value — but matching the existing CN keeps this a pure like-for-like replacement.)
+
+
+
+## STEP 6 — GENERATE HOT-1'S NEW TRANSPORT CERTIFICATE, SIGNED BY THE NEW CA
+
+
+/usr/share/elasticsearch/bin/elasticsearch-certutil cert \
+  --ca /root/es-cert-renewal/new-ca.p12 \
+  --ca-pass '' \
+  --in /root/es-cert-renewal/hot-1-transport-instance.yml \
+  --out /root/es-cert-renewal/hot-1-transport.zip \
+  --pass '<hot-1-existing-transport-passphrase>'
+
+
+Unzip it:
+
+
+cd /root/es-cert-renewal
+unzip hot-1-transport.zip -d hot-1-transport
+
+
+Result: `hot-1-transport/instance/instance.p12` — hot-1's new transport `.p12`, containing the new private key (protected by hot-1's existing passphrase), new certificate, and the new CA.
