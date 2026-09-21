@@ -15,6 +15,7 @@ mkdir -p /root/es-cert-renewal && cd /root/es-cert-renewal
   --out /root/es-cert-renewal/new-ca.p12 \
   --pass ''
 
+- - - - - - - - - - - -
 
 ## STEP 5 — CREATE THE SINGLE-INSTANCE YAML FOR HOT-1 TRANSPORT
 
