@@ -53,6 +53,7 @@ Result: `hot-1-transport/instance/instance.p12` — hot-1's new transport `.p12`
 
 ===================================
 
+
 7) Extract the unencrypted key and cert separately:
 
 bash
