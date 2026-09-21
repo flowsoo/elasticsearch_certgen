@@ -5,7 +5,7 @@ Run these checks against `hot-1-transport/instance/instance.p12` and compare wit
 ```bash
 openssl pkcs12 -in hot-1-transport/instance/instance.p12 \
   -nocerts -nodes \
-  -passin pass:'<hot-1-existing-transport-passphrase>' \
+  -passin pass:'<hot-1-existing-transport-P12 FILE passphrase !!!>' \
   -out /tmp/verify-key.pem 2>&1
 ```
 
